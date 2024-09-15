@@ -41,7 +41,6 @@ class ApiManager {
 
   static Future<PopularModel> getTopMovies () async{
     final response = await http.get(Uri.parse('$_popularBaseUrl?apiKey=${Constants.apiKey}'));
-
     if(response.statusCode >= 200 && response.statusCode < 300){
       Map json = jsonDecode(response.body) as Map;
       return PopularModel.fromJson(json);

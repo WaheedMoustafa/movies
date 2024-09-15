@@ -138,7 +138,7 @@ class _HomeState extends State<Home> {
           child: Column(
             children: [
               CachedNetworkImage(
-                imageUrl: upComingResults.posterPath ?? "",
+                imageUrl: "${Constants.imagePath}/${upComingResults.posterPath}" ?? "",
                 placeholder: (context, url) => LoadingView(),
                 errorWidget: (context, url, error) => Icon(Icons.error),
                 height: MediaQuery.of(context).size.height * .25,
@@ -160,7 +160,7 @@ class _HomeState extends State<Home> {
         child: Column(
           children: [
             CachedNetworkImage(
-              imageUrl: topRatedResults.posterPath ?? "",
+              imageUrl: "${Constants.imagePath}/${topRatedResults.posterPath}" ?? "",
               placeholder: (context, url) => LoadingView(),
               errorWidget: (context, url, error) => Icon(Icons.error),
               height: MediaQuery.of(context).size.height * .25,
@@ -186,7 +186,7 @@ class _HomeState extends State<Home> {
           child: Column(
             children: [
               CachedNetworkImage(
-                imageUrl: popularResults.posterPath ?? "",
+                imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
                 placeholder: (context, url) => LoadingView(),
                 errorWidget: (context, url, error) => Icon(Icons.error),
                 height: MediaQuery.of(context).size.height * .25,
@@ -220,7 +220,7 @@ class _HomeState extends State<Home> {
           child: Column(
             children: [
               CachedNetworkImage(
-                imageUrl: popularResults.posterPath ?? "",
+                imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
                 placeholder: (context, url) => LoadingView(),
                 errorWidget: (context, url, error) => Icon(Icons.error),
                 height: MediaQuery.of(context).size.height * .25,
