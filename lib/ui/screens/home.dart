@@ -2,15 +2,13 @@ import 'dart:ffi';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:movies/models/api_manager.dart';
-import 'package:movies/models/popular_model/Popular_model.dart';
 import 'package:movies/models/top_rated_model/Results.dart';
-import 'package:movies/models/top_rated_model/Top_rated.dart';
 import 'package:movies/models/upcoming_model/Results.dart';
 import 'package:movies/ui/constants.dart';
+import 'package:movies/ui/screens/home_view_model.dart';
+import 'package:provider/provider.dart';
+import '../../models/base.dart';
 import '../../models/popular_model/Results.dart';
-import '../../models/upcoming_model/Upcoming.dart';
 import '../../widgets/error_widget.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -24,74 +22,96 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  TopMoviesViewModel topMoviesViewModel = TopMoviesViewModel();
+  UpcomingViewModel upcomingViewModel = UpcomingViewModel();
+  TopRatedViewModel topRatedViewModel = TopRatedViewModel() ;
+
   bool isClicked = false ;
 
 
   @override
+  void initState() {
+    super.initState();
+    topMoviesViewModel.getTopMovies();
+    upcomingViewModel.getNewReleases();
+    topRatedViewModel.getNewRecommended();
+
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-  return Scaffold(
-    backgroundColor: Colors.black,
-  body: SafeArea(
-    child: SingleChildScrollView(
-      child: Column(
-        children: [
-          const Text('Popular',style: TextStyle(color: Colors.white,fontSize: 25),),
-      FutureBuilder<PopularModel> (
-      future:  ApiManager.getTopMovies(),
-        builder: (context,snapshot) {
-          if (snapshot.hasError) {
-            return ErrorView(
-                error: snapshot.error.toString(), onRetryClick: () {});
-          } else if (snapshot.hasData) {
-            return buildTopMoviesList(snapshot.data!.results!);
-          } else {
-            return LoadingView();
+  return SafeArea(
+    child: Column(
+      children: [
+        ChangeNotifierProvider(
+          create: (_) => topMoviesViewModel,
+          builder: (context ,_) {
+            topMoviesViewModel = Provider.of(context);
+            if (topMoviesViewModel.popularApiState is BaseLoadingState) {
+              return const LoadingView();
+            } else if (topMoviesViewModel.popularApiState is BaseErrorState) {
+              String errorMessage =
+                  (topMoviesViewModel.popularApiState as BaseErrorState).errorMessage;
+              return ErrorView(error: errorMessage, onRetryClick: () {});
+            }
+            else {
+              List<PopularResults> topMovies =
+                  (topMoviesViewModel.popularApiState as BaseSuccessState<List<PopularResults>>)
+                      .data;
+              return buildTopMoviesList(topMovies);
+            }
 
-          }
-        }
+          },
+
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => upcomingViewModel,
+          builder: (context ,_) {
+            upcomingViewModel = Provider.of(context);
+            if (upcomingViewModel.upcomingApiState is BaseLoadingState) {
+              return const LoadingView();
+            } else if (upcomingViewModel.upcomingApiState is BaseErrorState) {
+              String errorMessage =
+                  (upcomingViewModel.upcomingApiState as BaseErrorState).errorMessage;
+              return ErrorView(error: errorMessage, onRetryClick: () {});
+            }
+            else {
+              List<UpcomingResults> newReleasesMovies =
+                  (upcomingViewModel.upcomingApiState as BaseSuccessState<List<UpcomingResults>>)
+                      .data;
+              return buildNewReleasesList(newReleasesMovies);
+            }
+
+          },
+
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => topRatedViewModel,
+          builder: (context ,_) {
+            topRatedViewModel = Provider.of(context);
+            if (topRatedViewModel.topRatedApiState is BaseLoadingState) {
+              return const LoadingView();
+            } else if (topRatedViewModel.topRatedApiState is BaseErrorState) {
+              String errorMessage =
+                  (topRatedViewModel.topRatedApiState as BaseErrorState).errorMessage;
+              return ErrorView(error: errorMessage, onRetryClick: () {});
+            }
+            else {
+              List<TopRatedResults> topRatedMovies =
+                  (topRatedViewModel.topRatedApiState as BaseSuccessState<List<TopRatedResults>>)
+                      .data;
+              return buildRecommendedList(topRatedMovies);
+            }
+
+          },
+
+        ),
+      ],
     ),
-      const SizedBox(height: 20,),
-         const Text('New Releases',style: TextStyle(color: Colors.white,fontSize: 25),),
-         const SizedBox(height: 20,),
-          FutureBuilder<Upcoming> (
-              future:  ApiManager.getNewReleases(),
-              builder: (context,snapshot) {
-                if (snapshot.hasError) {
-                  return ErrorView(
-                      error: snapshot.error.toString(), onRetryClick: () {});
-                } else if (snapshot.hasData) {
-                  return  buildNewReleasesList(snapshot.data!.results!);
-
-                } else {
-                  return LoadingView();
-
-                }
-              }
-          ),
-         const SizedBox(height: 20,),
-         const Text('Recommended',style: TextStyle(color: Colors.white,fontSize: 25),),
-         const SizedBox(height: 20,),
-          FutureBuilder<TopRated> (
-              future:  ApiManager.getNewRecommended(),
-              builder: (context,snapshot) {
-                if (snapshot.hasError) {
-                  return ErrorView(
-                      error: snapshot.error.toString(), onRetryClick: () {});
-                } else if (snapshot.hasData) {
-                  return buildRecommendedList(snapshot.data!.results!);
-
-                } else {
-                  return LoadingView();
-
-                }
-              }
-          ),
-        ],
-      ),
-    ),
-  ),
-   );
+  );
   }
 
 
@@ -172,7 +192,7 @@ class _HomeState extends State<Home> {
   }
 
 
-  mapPopularWidget(BuildContext context,PopularResults popularResults) {
+  mapPopularWidget(BuildContext context, PopularResults popularResults) {
     if(isClicked == false){
       return InkWell(
         onTap: (){
@@ -183,26 +203,35 @@ class _HomeState extends State<Home> {
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 13,vertical: 3),
-          child: Column(
-            children: [
+          child: Stack(
+            children : [
               CachedNetworkImage(
                 imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
-                placeholder: (context, url) => LoadingView(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-                height: MediaQuery.of(context).size.height * .25,
+                placeholder: (context, url) => const LoadingView(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                height: MediaQuery.of(context).size.height * .50,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(popularResults.title ?? "" ,
-                    style: TextStyle(fontSize: 15,color: Colors.grey),),
-                  const SizedBox(width: 20,),
-                ],
-              ),
-              Text(popularResults.releaseDate ?? "",
-                style: TextStyle(fontSize: 20,fontWeight:FontWeight.w600 ,color: Colors.black),),
-              const SizedBox(width: 200,),
-            ],
+              Column(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
+                  placeholder: (context, url) => const LoadingView(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  height: MediaQuery.of(context).size.height * .25,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(popularResults.title ?? "" ,
+                      style: const TextStyle(fontSize: 15,color: Colors.grey),),
+                    const SizedBox(width: 20,),
+                  ],
+                ),
+                Text(popularResults.releaseDate ?? "",
+                  style: const TextStyle(fontSize: 20,fontWeight:FontWeight.w600 ,color: Colors.black),),
+                const SizedBox(width: 200,),
+              ],
+            ),],
           ),
         ),
       );
