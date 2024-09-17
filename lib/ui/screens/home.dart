@@ -147,7 +147,7 @@ class _HomeState extends State<Home> {
       );
   }
 
-  mapUpcomingWidget(BuildContext context,UpcomingResults upComingResults) {
+  mapUpcomingWidget(BuildContext context,UpcomingResults upComingResults ) {
       return InkWell(
         onTap: (){
           setState(() {
@@ -157,12 +157,15 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.symmetric(horizontal: 13,vertical: 3),
           child: Column(
             children: [
-              CachedNetworkImage(
-                imageUrl: "${Constants.imagePath}/${upComingResults.posterPath}" ?? "",
-                placeholder: (context, url) => LoadingView(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-                height: MediaQuery.of(context).size.height * .25,
+              Container(
+                child: Text(upComingResults.title ?? ""),
               ),
+           //  CachedNetworkImage(
+           //    imageUrl: "${Constants.imagePath}/${upComingResults.posterPath}" ?? "",
+           //    placeholder: (context, url) => LoadingView(),
+           //    errorWidget: (context, url, error) => Icon(Icons.error),
+           //    height: MediaQuery.of(context).size.height * .25,
+           //  ),
             ],
           ),
         ),
@@ -179,12 +182,15 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.symmetric(horizontal: 13,vertical: 3),
         child: Column(
           children: [
-            CachedNetworkImage(
-              imageUrl: "${Constants.imagePath}/${topRatedResults.posterPath}" ?? "",
-              placeholder: (context, url) => LoadingView(),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-              height: MediaQuery.of(context).size.height * .25,
+            Container(
+              child: Text(topRatedResults.title ?? ""),
             ),
+        //    CachedNetworkImage(
+        //      imageUrl: "${Constants.imagePath}/${topRatedResults.posterPath}" ?? "",
+        //      placeholder: (context, url) => LoadingView(),
+        //      errorWidget: (context, url, error) => Icon(Icons.error),
+        //      height: MediaQuery.of(context).size.height * .25,
+        //    ),
           ],
         ),
       ),
@@ -193,10 +199,8 @@ class _HomeState extends State<Home> {
 
 
   mapPopularWidget(BuildContext context, PopularResults popularResults) {
-    if(isClicked == false){
       return InkWell(
         onTap: (){
-          isClicked = !isClicked ;
           setState(() {
 
           });
@@ -205,20 +209,20 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.symmetric(horizontal: 13,vertical: 3),
           child: Stack(
             children : [
-              CachedNetworkImage(
-                imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
-                placeholder: (context, url) => const LoadingView(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                height: MediaQuery.of(context).size.height * .50,
-              ),
+            //  CachedNetworkImage(
+            //    imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
+            //    placeholder: (context, url) => const LoadingView(),
+            //    errorWidget: (context, url, error) => const Icon(Icons.error),
+            //    height: MediaQuery.of(context).size.height * .50,
+            //  ),
               Column(
               children: [
-                CachedNetworkImage(
-                  imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
-                  placeholder: (context, url) => const LoadingView(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                  height: MediaQuery.of(context).size.height * .25,
-                ),
+            //  CachedNetworkImage(
+            //    imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
+            //    placeholder: (context, url) => const LoadingView(),
+            //    errorWidget: (context, url, error) => const Icon(Icons.error),
+            //    height: MediaQuery.of(context).size.height * .25,
+            //  ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -235,41 +239,7 @@ class _HomeState extends State<Home> {
           ),
         ),
       );
-    }
-    else if(isClicked == true){
-      return InkWell(
-        onTap: (){
-          isClicked = !isClicked ;
-          setState(() {
 
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 13,vertical: 3),
-          child: Column(
-            children: [
-              CachedNetworkImage(
-                imageUrl: "${Constants.imagePath}/${popularResults.posterPath}" ?? "",
-                placeholder: (context, url) => LoadingView(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-                height: MediaQuery.of(context).size.height * .25,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(popularResults.title ?? "",style: TextStyle(fontSize: 15,color: Colors.grey),),
-                  const SizedBox(width: 20,),
-                ],
-              ),
-              Text(popularResults.releaseDate ?? "",
-                style: TextStyle(fontSize: 20,fontWeight:FontWeight.w600 ,color: Colors.black),),
-
-              Text(popularResults.overview ?? ""),
-            ],
-          ),
-        ),
-      );
-    }
   }
 
 
